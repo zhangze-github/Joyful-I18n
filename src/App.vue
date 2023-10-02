@@ -1,9 +1,10 @@
 <script setup>
-import List from './page/list/index.vue'
+// import List from './page/list/index.vue'
 </script>
 
 <template>
-  <List></List>
+<!--  <List></List>-->
+  <router-view/>
 </template>
 
 <style scoped>

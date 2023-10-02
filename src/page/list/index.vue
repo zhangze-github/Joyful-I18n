@@ -3,6 +3,9 @@
         <a-button @click="openDir" type="primary">
             打开I18n文件夹
         </a-button>
+        <a-button @click="sortGlobal" type="primary" v-if="storage.fileList.length" style="margin-left: 20px">
+            Sort 一下所有语言包
+        </a-button>
         {{fileList}}
         <div class="list">
             <div class="item" v-for="i in storage.fileList">
@@ -10,15 +13,13 @@
                 <div class="content">{{i.content}}</div>
             </div>
         </div>
-
     </div>
-
 </template>
 
 <script setup>
-import {ref} from 'vue'
 import {message} from "ant-design-vue";
 import {useStorage} from "../../store/storage.js";
+import SortJson from 'sort-json';
 
 const storage = useStorage();
 
@@ -39,8 +40,6 @@ async function openDir() {
                 const reader = new FileReader();
                 let fileObject = await file[1].getFile()
                 reader.readAsText(fileObject, "utf-8");
-                console.log(file[1])
-
                 reader.onload = function (e) {
                     returnList.push({
                         name: file[0],
@@ -60,6 +59,25 @@ async function openDir() {
     console.log(returnList)
 }
 
+async function sortGlobal(){
+    const {fileList} = storage;
+    let returnList = []
+    for (let i = 0; i < fileList.length; i++){
+        let {name, content, file} = fileList[i];
+        let writable = await file.createWritable();
+        await writable.write(SortJson(content))
+        await writable.close();
+        returnList.push({
+            name,
+            content,
+            file
+        })
+    }
+    message.success('排序完成，已写入源文件，请到源文件查看更改')
+    storage.$patch({
+        fileList: returnList
+    })
+}
 
 // let writable = await file[1].createWritable();
 // writable.write('123')
