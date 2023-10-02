@@ -13,6 +13,12 @@ const router = createRouter({
                     name: 'list',
                     component: () =>
                         import('../page/list/index.vue'),
+                },
+                {
+                    path: 'lang',
+                    name: 'lang',
+                    component: () =>
+                        import('../page/lang/index.vue'),
                 }
             ],
         },

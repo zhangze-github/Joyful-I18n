@@ -1,7 +1,7 @@
 <template>
     <div class="wrapper">
         <div class="header">
-            <a-menu v-model:selectedKeys="current" mode="horizontal" :items="items"/>
+            <a-menu v-model:selectedKeys="current" mode="horizontal" :items="items" @click="change"/>
         </div>
         <div class="content">
             <router-view/>
@@ -11,6 +11,10 @@
 <script setup>
 import {ref} from 'vue';
 const current = ref(['list']);
+import {useRouter} from "vue-router";
+
+const router = useRouter();
+
 const items = ref([
     {
         key: 'list',
@@ -23,6 +27,10 @@ const items = ref([
         title: '语言包',
     }
 ]);
+
+function change(e){
+    router.push(`/home/${e.key}`)
+}
 
 </script>
 
