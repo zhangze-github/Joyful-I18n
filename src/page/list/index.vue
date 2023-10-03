@@ -44,7 +44,8 @@ async function openDir() {
                     returnList.push({
                         name: file[0],
                         content: e.target.result,
-                        file: file[1]
+                        file: file[1],
+                        key: file[0].split('.')[0]
                     })
                     resolve()
                 }
@@ -63,14 +64,15 @@ async function sortGlobal(){
     const {fileList} = storage;
     let returnList = []
     for (let i = 0; i < fileList.length; i++){
-        let {name, content, file} = fileList[i];
+        let {name, content, file, key} = fileList[i];
         let writable = await file.createWritable();
         await writable.write(SortJson(content))
         await writable.close();
         returnList.push({
             name,
             content,
-            file
+            file,
+            key,
         })
     }
     message.success('排序完成，已写入源文件，请到源文件查看更改')
