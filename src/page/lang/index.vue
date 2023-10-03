@@ -15,10 +15,16 @@
                              <a-tooltip title="添加一个I18n Key" @click="addI18n(key)">
                                 <PlusCircleOutlined style="margin-left: 20px"/>
                              </a-tooltip>
+                              <a-tooltip title="删除" @click="deleteItem(key)">
+                                 <DeleteOutlined style="margin-left: 20px; color: #f40"/>
+                             </a-tooltip>
                         </span>
                         <span v-else>
                              <a-tooltip title="编辑" @click="editI18n(key)">
                                  <EditOutlined style="margin-left: 20px"/>
+                             </a-tooltip>
+                             <a-tooltip title="删除" @click="deleteItem(key)">
+                                 <DeleteOutlined style="margin-left: 20px; color: #f40" />
                              </a-tooltip>
                         </span>
                     </div>
@@ -38,8 +44,8 @@ import {message} from "ant-design-vue";
 import {useStorage} from "../../store/storage.js";
 import {onMounted, ref, toRaw, watch, h, nextTick} from "vue";
 import { find, isEmpty, set, trim} from "lodash";
-import {handleData} from "../../util/utils.js";
-import {PlusCircleOutlined, FolderAddOutlined, EditOutlined} from "@ant-design/icons-vue";
+import {handleData, removeEmptyValues} from "../../util/utils.js";
+import {PlusCircleOutlined, FolderAddOutlined, EditOutlined, DeleteOutlined} from "@ant-design/icons-vue";
 import EditI18n from "./editI18n.vue";
 import {useRouter} from "vue-router";
 
@@ -132,6 +138,32 @@ function handleCancel() {
 
 function addRootKey(){
     modalVisible.value = '';
+}
+
+function deleteItem(e){
+    let langList = toRaw(storage.fileList);
+    langList = langList.map(item => {
+        let {content} = item;
+        // 将要删除的值置为空串
+        set(content, e, "");
+        // 移除掉所有为空串的键值对
+        removeEmptyValues(content)
+        return {
+            ...item,
+            content
+        }
+    })
+    storage.$patch({
+        fileList: langList
+    })
+    nextTick(() => {
+        initData()
+        storage.updateFileList();
+    })
+}
+
+function deleteDir(){
+
 }
 
 </script>

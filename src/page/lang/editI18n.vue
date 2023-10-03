@@ -56,6 +56,7 @@ const storage = useStorage();
 const keyValue = ref('')
 const langValue = ref({})
 const qianzhui = ref('');
+const isTranlating = ref(false)
 import {find, get, isEmpty, isString, set, trim} from "lodash";
 import {translationI18n} from "../../util/utils.js";
 
@@ -120,12 +121,22 @@ function handleOk() {
 
 async function translation(key) {
     let value = langValue.value[key]
-    for (let i = 0; i < storage.fileList.length; i++) {
-        let {key: langKey} = storage.fileList[i];
-        if (langKey !== key) {
-            let res = await translationI18n(value, langKey)
-            langValue.value[langKey] = res
+    if(isTranlating.value){
+        message.error('翻译进行中')
+    }
+    isTranlating.value = true;
+    try{
+        for (let i = 0; i < storage.fileList.length; i++) {
+            let {key: langKey} = storage.fileList[i];
+            if (langKey !== key) {
+                let res = await translationI18n(value, langKey)
+                langValue.value[langKey] = res
+            }
         }
+    }catch (e){
+        message.error('翻译失败')
+    }finally {
+        isTranlating.value = false;
     }
 }
 
@@ -133,8 +144,10 @@ function copy() {
     let value = keyValue.value
     if(props.isEditI18n){
         CopyToClipboardw(keyValue.value)
+        message.success('已复制Key：' + keyValue.value)
     }else{
         CopyToClipboardw(qianzhui.value + trim(keyValue.value))
+        message.success('已复制Key：' + qianzhui.value + trim(keyValue.value))
     }
 }
 
