@@ -43,7 +43,7 @@ async function openDir() {
                 reader.onload = function (e) {
                     returnList.push({
                         name: file[0],
-                        content: e.target.result,
+                        content: JSON.parse(e.target.result),
                         file: file[1],
                         key: file[0].split('.')[0]
                     })

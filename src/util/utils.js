@@ -3,17 +3,24 @@ export function handleData(obj, keyStr=''){
     if(typeof obj === 'object') {
         return map(obj, (item, key) => {
             let isStringChildren = isString(item)
-            let children = handleData(item)
             const itemKey = keyStr ? `${keyStr}.${key}` : key;
-            return {
-                title: key ,
-                // key: generateRandomString(10) + (isStringChildren ? item : ""),
-                key: itemKey,
-                children: isStringChildren ? null : children,
+            let children = handleData(item, itemKey)
+            if(isString(item)){
+                return {
+                    title:`${key} : ${item}` ,
+                    key: itemKey,
+                }
+            }else{
+                return {
+                    title:key ,
+                    key: itemKey,
+                    children: isStringChildren ? null : children,
+                }
             }
+
         })
     }else if(typeof obj === "string"){
-        return obj
+        return keyStr + obj
     }
 }
 
@@ -68,4 +75,14 @@ export function findKeyByValue(obj, value, currentPath = '') {
 
     }
     return null;
+}
+
+import axios from 'axios';
+export async function translation(text, lang){
+    let res = await axios.post('https://k7qfk5uewz.hk.aircode.run/hello', {
+        text,
+        lang
+    })
+    console.log(res)
+    return res;
 }
