@@ -3,9 +3,9 @@
         <a-button @click="openDir" type="primary">
             打开I18n文件夹
         </a-button>
-        <a-button @click="sortGlobal" type="primary" v-if="storage.fileList.length" style="margin-left: 20px">
-            Sort 一下所有语言包
-        </a-button>
+<!--        <a-button @click="sortGlobal" type="primary" v-if="storage.fileList.length" style="margin-left: 20px">-->
+<!--            Sort 一下所有语言包-->
+<!--        </a-button>-->
         {{fileList}}
         <div class="list">
             <div class="item" v-for="i in storage.fileList">

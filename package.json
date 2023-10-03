@@ -12,6 +12,8 @@
     "@ant-design/icons-vue": "^7.0.0",
     "ant-design-vue": "^4.0.3",
     "axios": "^1.5.1",
+    "clipboard": "^2.0.11",
+    "copy-to-clipboard": "^3.3.3",
     "lodash": "^4.17.21",
     "pinia": "^2.1.6",
     "sort-json": "^2.0.1",

@@ -7,27 +7,32 @@
             destroyOnClose
             :closable="false"
             :maskClosable="false"
-            width="50%"
+            width="600px"
     >
         <div class="item">
             <div class="left">key</div>
             <div class="center">
-                <a-input v-model:value="keyValue"/>
+                <a-input v-model:value="keyValue" disabled v-if="props.isEditI18n"/>
+                <a-input-group compact v-else>
+                    <a-input v-model:value="qianzhui" style="width: 50%" disabled/>
+                    <a-input v-model:value="keyValue" style="width: 50%" />
+                </a-input-group>
             </div>
             <div class="right">
-
+                <a-button type="primary" shape="circle" :icon="h(CopyOutlined)" @click="copy" style="margin-left: 20px"/>
             </div>
         </div>
         <div class="item" v-for="item in storage.fileList" v-if="!isEmpty(langValue)">
-            <div class="left">{{item.key}}</div>
+            <div class="left">{{ item.key }}</div>
             <div class="center">
                 <a-input v-model:value="langValue[item.key]"/>
             </div>
             <div class="right">
-
+                <a-button @click="translation(item.key)" style="margin-left: 20px" >
+                    翻译
+                </a-button>
             </div>
         </div>
-
 
         <template #footer>
             <a-button type="primary" @click="handleOk">
@@ -41,58 +46,122 @@
 </template>
 
 <script setup>
-import {defineProps, onMounted, ref} from 'vue'
+import {defineProps, onMounted, ref, toRaw, watch, h} from 'vue'
 import {useStorage} from "../../store/storage.js";
+import {message} from "ant-design-vue";
+import {CopyOutlined} from "@ant-design/icons-vue";
+import CopyToClipboardw from 'copy-to-clipboard';
+
 const storage = useStorage();
 const keyValue = ref('')
 const langValue = ref({})
-import {isEmpty} from "lodash";
+const qianzhui = ref('');
+import {find, get, isEmpty, isString, set, trim} from "lodash";
+import {translationI18n} from "../../util/utils.js";
 
 const props = defineProps({
-    open: Boolean
+    open: Boolean,
+    editKey: String,
+    isEditI18n: Boolean
 })
 
-const emit = defineEmits(['update:open'])
+const emit = defineEmits(['update:open', 'seti18nText'])
 
-onMounted(() => {
-    console.log(storage.fileList)
-    let obj = {};
-    storage.fileList.forEach(item => {
-        obj[item.key] = ''
-    })
-    langValue.value = obj
+watch(() => props.open, () => {
+    if (props.open) {
+        keyValue.value = props.editKey
+        let obj = {};
+        storage.fileList.forEach(item => {
+            let {key} = item;
+            let currentValue = get(find(storage.fileList, {key}), `content.${props.editKey}`, '')
+            obj[item.key] = isString(currentValue) ? currentValue : '';
+        })
+        langValue.value = obj
+        if(!props.isEditI18n){
+            qianzhui.value = props.editKey + '.'
+            keyValue.value = ''
+        }
+    } else {
+        keyValue.value = ''
+        langValue.value = {}
+    }
 })
 
 function handleCancel() {
     emit('update:open', false)
 }
 
-function handleOk(){
-    console.log(langValue)
+function handleOk() {
+    let key = '';
+    if(props.isEditI18n){
+        key = keyValue.value
+    }else{
+        let value = trim(keyValue.value);
+        if(!value) {
+            message.error('key不能为空')
+            return;
+        }
+        if(value.includes('.')){
+            message.error('key不能包含.符号')
+            return;
+        }
+        key = qianzhui.value + value
+    }
+
+    let list = toRaw(storage.fileList)
+    list.map(item => {
+        set(item, `content.${key}`, langValue.value[item.key])
+    })
+    storage.$patch({
+        fileList: list
+    })
+    emit('seti18nText')
 }
 
+async function translation(key) {
+    let value = langValue.value[key]
+    for (let i = 0; i < storage.fileList.length; i++) {
+        let {key: langKey} = storage.fileList[i];
+        if (langKey !== key) {
+            let res = await translationI18n(value, langKey)
+            langValue.value[langKey] = res
+        }
+    }
+}
+
+function copy() {
+    let value = keyValue.value
+    if(props.isEditI18n){
+        CopyToClipboardw(keyValue.value)
+    }else{
+        CopyToClipboardw(qianzhui.value + trim(keyValue.value))
+    }
+}
 
 </script>
 
 <style lang="less" scoped>
 
-.item{
-    display: flex;
-    align-content: center;
-    justify-content: center;
-    margin-bottom: 10px;
-    .left{
-        width: 20%;
-        line-height: 30px;
-        text-align: center;
-        font-weight: 600;
-    }
-    .center{
-        width: 60%;
-    }
-    .right{
-        width: 20%;
-    }
+.item {
+  display: flex;
+  align-content: center;
+  justify-content: center;
+  margin-bottom: 10px;
+
+  .left {
+    width: 20%;
+    line-height: 30px;
+    text-align: center;
+    font-weight: 600;
+  }
+
+  .center {
+    width: 60%;
+  }
+
+  .right {
+    width: 20%;
+  }
 }
 
 </style>

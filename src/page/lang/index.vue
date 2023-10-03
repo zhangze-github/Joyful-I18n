@@ -6,16 +6,16 @@
                     <div :flagKey="key">
                         {{ title }}
 
-                        <span  v-if="children">
-                             <a-tooltip title="添加一个文件夹" @click="addI18nDir(key)" >
-                                 <FolderAddOutlined style="margin-left: 20px" />
+                        <span v-if="children">
+                             <a-tooltip title="添加一个文件夹" @click="addI18nDir(key)">
+                                 <FolderAddOutlined style="margin-left: 20px"/>
                              </a-tooltip>
                              <a-tooltip title="添加一个I18n Key" @click="addI18n(key)">
-                                <PlusCircleOutlined style="margin-left: 20px" />
+                                <PlusCircleOutlined style="margin-left: 20px"/>
                              </a-tooltip>
                         </span>
-                        <span  v-else>
-                             <a-tooltip title="编辑" @click="editI18n(key)" >
+                        <span v-else>
+                             <a-tooltip title="编辑" @click="editI18n(key)">
                                  <EditOutlined style="margin-left: 20px"/>
                              </a-tooltip>
                         </span>
@@ -28,14 +28,14 @@
         {{ modalVisible }}
         <a-input v-model:value="modalInputValue"></a-input>
     </a-modal>
-    <EditI18n v-model:open="drawerVisible" :editKey="editKey"/>
+    <EditI18n v-model:open="drawerVisible" :editKey="editKey" :isEditI18n="isEditI18n" @seti18nText="seti18nText"/>
 </template>
 
 <script setup>
 import {message} from "ant-design-vue";
 import {useStorage} from "../../store/storage.js";
 import {onMounted, ref, toRaw, watch, h, nextTick} from "vue";
-import {get, find, isEmpty, set} from "lodash";
+import { find, isEmpty, set, trim} from "lodash";
 import {handleData} from "../../util/utils.js";
 import {PlusCircleOutlined, FolderAddOutlined, EditOutlined} from "@ant-design/icons-vue";
 import EditI18n from "./editI18n.vue";
@@ -45,7 +45,7 @@ const treeData = ref({})
 const selectedKeys = ref(['']);
 const modalVisible = ref(false);
 const modalInputValue = ref('')
-const isAddDir = ref(false)
+const isEditI18n = ref(false)
 const drawerVisible = ref(false)
 const editKey = ref('')
 
@@ -57,21 +57,37 @@ function initData() {
     let value = find(storage.fileList, {key: 'en'}) || {}
     if (isEmpty(value)) return;
     let parsedValue = handleData(toRaw(value.content))
-    console.log(parsedValue)
     treeData.value = parsedValue
 }
 
 function addI18n(e) {
+    isEditI18n.value = false;
     drawerVisible.value = true;
     editKey.value = e
 }
 
-function addI18nDir(e){
+function editI18n(e) {
+    isEditI18n.value = true;
+    editKey.value = e
+    drawerVisible.value = true;
+}
+
+
+function addI18nDir(e) {
     modalVisible.value = e;
 }
 
 function handleOk() {
     let value = modalInputValue.value;
+    value = trim(value);
+    if(value.length === 0) {
+        message.error('文件夹名称不能为空')
+        return;
+    }
+    if(value.includes('.')) {
+        message.error('文件夹名称不能包含.')
+        return;
+    }
     let key = modalVisible.value;
     let langList = toRaw(storage.fileList);
     langList = langList.map(item => {
@@ -82,26 +98,26 @@ function handleOk() {
             content
         }
     })
-    console.log(langList)
     storage.$patch({
         fileList: langList
     })
     nextTick(() => {
         initData()
         modalVisible.value = false;
+        storage.updateFileList();
     })
+}
+
+function seti18nText(){
+    initData();
+    drawerVisible.value = false;
+    storage.updateFileList()
 }
 
 function handleCancel() {
     modalVisible.value = false;
     modalInputValue.value = '';
 }
-
-function editI18n(e){
-    drawerVisible.value = true;
-    editKey.value = e
-}
-
 
 
 

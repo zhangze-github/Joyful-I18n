@@ -9,9 +9,22 @@
     </div>
 </template>
 <script setup>
-import {ref} from 'vue';
+import {ref, watch} from 'vue';
 const current = ref(['list']);
-import {useRouter} from "vue-router";
+import {useRouter, useRoute} from "vue-router";
+const route = useRoute();
+
+watch(() => route.path, () =>{
+    if(route.path === '/home/list'){
+        current.value = ['list']
+    }else if(route.path === '/home/lang'){
+        current.value = ['lang']
+    }else{
+        current.value = []
+    }
+}, {
+    immediate: true
+})
 
 const router = useRouter();
 

@@ -78,11 +78,10 @@ export function findKeyByValue(obj, value, currentPath = '') {
 }
 
 import axios from 'axios';
-export async function translation(text, lang){
+export async function translationI18n(text, lang){
     let res = await axios.post('https://k7qfk5uewz.hk.aircode.run/hello', {
         text,
         lang
     })
-    console.log(res)
-    return res;
+    return res.data;
 }
