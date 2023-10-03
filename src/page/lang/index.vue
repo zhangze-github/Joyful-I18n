@@ -60,12 +60,12 @@ const drawerVisible = ref(false)
 const editKey = ref('')
 
 onMounted(() => {
-    if(isEmpty(storage.fileList)){
-        message.error('请先选中一个语言包文件夹')
-        router.push('/home/list')
-    }else{
+    // if(isEmpty(storage.fileList)){
+    //     message.error('请先选中一个语言包文件夹')
+    //     router.push('/home/list')
+    // }else{
         initData()
-    }
+    // }
 })
 
 function initData() {
