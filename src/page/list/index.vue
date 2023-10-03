@@ -1,7 +1,7 @@
 <template>
     <div class="wrapper">
         <a-button @click="openDir" type="primary">
-            打开I18n文件夹
+            打开本地I18n文件夹
         </a-button>
 <!--        <a-button @click="sortGlobal" type="primary" v-if="storage.fileList.length" style="margin-left: 20px">-->
 <!--            Sort 一下所有语言包-->
@@ -80,10 +80,6 @@ async function sortGlobal(){
         fileList: returnList
     })
 }
-
-// let writable = await file[1].createWritable();
-// writable.write('123')
-// await writable.close();
 
 </script>
 

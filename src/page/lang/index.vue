@@ -1,11 +1,13 @@
 <template>
     <div>
+        <a-button @click="addRootKey" style="margin-bottom: 20px">
+            添加一个根目录Key
+        </a-button>
         <div class="content" v-if="!isEmpty(treeData)">
             <a-tree v-model:selectedKeys="selectedKeys" :tree-data="treeData" show-icon showLine>
                 <template #title="{ title, key, children }">
                     <div :flagKey="key">
                         {{ title }}
-
                         <span v-if="children">
                              <a-tooltip title="添加一个文件夹" @click="addI18nDir(key)">
                                  <FolderAddOutlined style="margin-left: 20px"/>
@@ -39,7 +41,9 @@ import { find, isEmpty, set, trim} from "lodash";
 import {handleData} from "../../util/utils.js";
 import {PlusCircleOutlined, FolderAddOutlined, EditOutlined} from "@ant-design/icons-vue";
 import EditI18n from "./editI18n.vue";
+import {useRouter} from "vue-router";
 
+const router = useRouter()
 const storage = useStorage();
 const treeData = ref({})
 const selectedKeys = ref(['']);
@@ -50,7 +54,12 @@ const drawerVisible = ref(false)
 const editKey = ref('')
 
 onMounted(() => {
-    initData()
+    if(isEmpty(storage.fileList)){
+        message.error('请先选中一个语言包文件夹')
+        router.push('/home/list')
+    }else{
+        initData()
+    }
 })
 
 function initData() {
@@ -89,10 +98,11 @@ function handleOk() {
         return;
     }
     let key = modalVisible.value;
+    key = key ? `${key}.${value}` : value;
     let langList = toRaw(storage.fileList);
     langList = langList.map(item => {
         let {content} = item;
-        set(content, `${key}.${value}`, {});
+        set(content, key, {});
         return {
             ...item,
             content
@@ -106,6 +116,7 @@ function handleOk() {
         modalVisible.value = false;
         storage.updateFileList();
     })
+    modalInputValue.value = '';
 }
 
 function seti18nText(){
@@ -119,7 +130,9 @@ function handleCancel() {
     modalInputValue.value = '';
 }
 
-
+function addRootKey(){
+    modalVisible.value = '';
+}
 
 </script>
 
