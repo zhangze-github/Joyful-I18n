@@ -8,7 +8,6 @@ export const useStorage = defineStore('storage', {
     actions: {
         async updateFileList() {
             let list = toRaw(this.fileList);
-            console.log(list)
             for (let i = 0; i < list.length; i++) {
                 let {
                     content,

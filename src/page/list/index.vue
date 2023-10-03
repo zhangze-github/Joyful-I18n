@@ -53,11 +53,11 @@ async function openDir() {
         }
     } catch (e) {
         console.log(e)
+        message.error('读取本地文件失败')
     }
     storage.$patch({
         fileList: returnList
     })
-    console.log(returnList)
 }
 
 async function sortGlobal(){
