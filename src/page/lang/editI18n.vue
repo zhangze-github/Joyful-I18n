@@ -25,7 +25,7 @@
         <div class="item" v-for="item in storage.fileList" v-if="!isEmpty(langValue)">
             <div class="left">{{ item.key }}</div>
             <div class="center">
-                <a-input v-model:value="langValue[item.key]"/>
+                <a-textarea v-model:value="langValue[item.key]"/>
             </div>
             <div class="right">
                 <a-button @click="translation(item.key)" style="margin-left: 20px" >

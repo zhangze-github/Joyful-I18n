@@ -10,7 +10,7 @@
         <div class="list">
             <div class="item" v-for="i in storage.fileList">
                 <div class="name">{{i.name}}</div>
-                <div class="content">{{i.content}}</div>
+<!--                <div class="content">{{i.content}}</div>-->
             </div>
         </div>
     </div>
