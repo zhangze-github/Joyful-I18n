@@ -1,6 +1,6 @@
 <template>
     <div>
-        <a-button @click="addRootKey" style="margin-bottom: 20px">
+        <a-button @click="addRootKey" style="margin-bottom: 20px" v-if="!isEmpty(treeData)">
             添加一个根目录Key
         </a-button>
         <div class="content" v-if="!isEmpty(treeData)">
