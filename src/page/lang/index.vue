@@ -33,7 +33,6 @@
         </div>
     </div>
     <a-modal v-model:open="modalVisible" title="输入文件夹名称" @ok="handleOk" @cancel="handleCancel" size="small">
-        {{ modalVisible }}
         <a-input v-model:value="modalInputValue"></a-input>
     </a-modal>
     <EditI18n v-model:open="drawerVisible" :editKey="editKey" :isEditI18n="isEditI18n" @seti18nText="seti18nText"/>
