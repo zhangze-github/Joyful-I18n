@@ -14,7 +14,7 @@ export const useStorage = defineStore('storage', {
                     file,
                 } = list[i];
                 let writable = await file.createWritable();
-                writable.write(JSON.stringify(content, null, 4))
+                writable.write(JSON.stringify(content, null, 2))
                 await writable.close();
             }
         }
